@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
-const API_BASE = import.meta.env.VITE_API_URL || '';
+import API from '../services/api';
 
 const initialForm = {
   profileFor: 'Groom',
@@ -57,8 +55,9 @@ export default function AdminPanel() {
 
   const fetchProfiles = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/profiles`);
-      setProfiles(res.data.profiles || []);
+      const res = await API.get('/profiles');
+      const data = res.data.profiles || res.data || [];
+      setProfiles(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to fetch profiles:', err);
     }
@@ -71,6 +70,7 @@ export default function AdminPanel() {
 
   const handleEditClick = (profile) => {
     setEditingId(profile._id);
+    setImageFile(null); // Reset newly selected file state
     setFormData({
       profileFor: profile.profileFor || 'Groom',
       name: profile.name || '',
@@ -87,7 +87,7 @@ export default function AdminPanel() {
       caste: profile.caste || '',
       subCaste: profile.subCaste || '',
       kulam: profile.kulam || '',
-      kuladeivam: profile.kuladeivam || '',
+      kuladeivam: profile.kuladeivam || profile.kulamDeivam || '',
       gothram: profile.gothram || '',
       rasi: profile.rasi || '',
       star: profile.star || '',
@@ -130,23 +130,23 @@ export default function AdminPanel() {
     });
 
     if (imageFile) {
+      // Append for both key naming conventions to guarantee backend multer mapping
       submitData.append('profileImage', imageFile);
+      submitData.append('photo', imageFile);
     }
 
-    const token = localStorage.getItem('adminToken');
-    const config = {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    };
-
     try {
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+
       if (editingId) {
-        await axios.put(`${API_BASE}/api/profiles/${editingId}`, submitData, config);
+        await API.put(`/profiles/${editingId}`, submitData, config);
         alert('Profile Updated Successfully!');
       } else {
-        await axios.post(`${API_BASE}/api/profiles`, submitData, config);
+        await API.post('/profiles', submitData, config);
         alert('Profile Created Successfully!');
       }
       handleCancelEdit();
@@ -162,12 +162,7 @@ export default function AdminPanel() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this profile?')) {
       try {
-        const token = localStorage.getItem('adminToken');
-        await axios.delete(`${API_BASE}/api/profiles/${id}`, {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-        });
+        await API.delete(`/profiles/${id}`);
         fetchProfiles();
       } catch (err) {
         console.error('Delete error:', err);
@@ -175,11 +170,17 @@ export default function AdminPanel() {
     }
   };
 
+  // Helper function to extract image URL safely across schemas
   const getImageUrl = (profile) => {
-    if (profile.profileImage && profile.profileImage.url) {
-      return profile.profileImage.url;
+    if (profile.profileImage) {
+      if (typeof profile.profileImage === 'string') return profile.profileImage;
+      if (profile.profileImage.url) return profile.profileImage.url;
     }
-    return 'https://via.placeholder.com/50';
+    if (profile.photo) {
+      if (typeof profile.photo === 'string') return profile.photo;
+      if (profile.photo.url) return profile.photo.url;
+    }
+    return profile.img || 'https://via.placeholder.com/50?text=No+Image';
   };
 
   return (
@@ -367,7 +368,7 @@ export default function AdminPanel() {
               <td style={tdStyle}>
                 <img src={getImageUrl(item)} alt={item.name} style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '50%' }} />
               </td>
-              <td style={{ ...tdStyle, color: '#0056b3', fontWeight: 'bold' }}>{item.memberId}</td>
+              <td style={{ ...tdStyle, color: '#0056b3', fontWeight: 'bold' }}>{item.memberId || item._id}</td>
               <td style={tdStyle}>{item.name}</td>
               <td style={tdStyle}>{item.parentContact || '-'}</td>
               <td style={tdStyle}>{item.district}</td>
