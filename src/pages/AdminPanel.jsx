@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 const initialForm = {
   profileFor: 'Groom',
   name: '',
@@ -11,7 +13,7 @@ const initialForm = {
   weight: '',
   maritalStatus: 'Single',
   mobile: '',
-  parentContact: '', // 👈 Added
+  parentContact: '',
   email: '',
   religion: '',
   caste: '',
@@ -37,7 +39,7 @@ const initialForm = {
   district: '',
   state: '',
   pincode: '',
-  description: '', // 👈 Added
+  description: '',
   aboutMe: '',
   partnerExpectation: ''
 };
@@ -55,7 +57,7 @@ export default function AdminPanel() {
 
   const fetchProfiles = async () => {
     try {
-      const res = await axios.get('/api/profiles');
+      const res = await axios.get(`${API_BASE}/api/profiles`);
       setProfiles(res.data.profiles || []);
     } catch (err) {
       console.error('Failed to fetch profiles:', err);
@@ -79,7 +81,7 @@ export default function AdminPanel() {
       weight: profile.weight || '',
       maritalStatus: profile.maritalStatus || 'Single',
       mobile: profile.mobile || '',
-      parentContact: profile.parentContact || '', // 👈 Added
+      parentContact: profile.parentContact || '',
       email: profile.email || '',
       religion: profile.religion || '',
       caste: profile.caste || '',
@@ -105,7 +107,7 @@ export default function AdminPanel() {
       district: profile.district || '',
       state: profile.state || '',
       pincode: profile.pincode || '',
-      description: profile.description || '', // 👈 Added
+      description: profile.description || '',
       aboutMe: profile.aboutMe || '',
       partnerExpectation: profile.partnerExpectation || ''
     });
@@ -141,10 +143,10 @@ export default function AdminPanel() {
 
     try {
       if (editingId) {
-        await axios.put(`/api/profiles/${editingId}`, submitData, config);
+        await axios.put(`${API_BASE}/api/profiles/${editingId}`, submitData, config);
         alert('Profile Updated Successfully!');
       } else {
-        await axios.post('/api/profiles', submitData, config);
+        await axios.post(`${API_BASE}/api/profiles`, submitData, config);
         alert('Profile Created Successfully!');
       }
       handleCancelEdit();
@@ -161,7 +163,7 @@ export default function AdminPanel() {
     if (window.confirm('Are you sure you want to delete this profile?')) {
       try {
         const token = localStorage.getItem('adminToken');
-        await axios.delete(`/api/profiles/${id}`, {
+        await axios.delete(`${API_BASE}/api/profiles/${id}`, {
           headers: {
             Authorization: token ? `Bearer ${token}` : '',
           },
@@ -292,7 +294,6 @@ export default function AdminPanel() {
             <input name="motherName" value={formData.motherName} onChange={handleInputChange} style={inputStyle} />
           </div>
           <div>
-            {/* 👇 Parents Contact Field Added */}
             <label style={labelStyle}>Parents Contact Number</label>
             <input name="parentContact" value={formData.parentContact} onChange={handleInputChange} style={inputStyle} placeholder="e.g. +91 9876543210" />
           </div>
@@ -319,7 +320,6 @@ export default function AdminPanel() {
         <h4 style={sectionHeaderStyle}>📝 Additional Information</h4>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div>
-            {/* 👇 Description Field Added */}
             <label style={labelStyle}>Profile Description / Notes</label>
             <textarea
               name="description"
