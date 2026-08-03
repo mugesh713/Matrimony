@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../services/api';
 import { useApp } from '../AppContext';
 
 export default function SearchProfiles() {
   const navigate = useNavigate();
   const contextData = useApp();
   
-  // Local state to store fetched profiles if AppContext is empty
+  // Local state to store fetched profiles
   const [profilesList, setProfilesList] = useState([]);
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Filter States
   const [vtvId, setVtvId] = useState('');
@@ -18,15 +17,15 @@ export default function SearchProfiles() {
   const [district, setDistrict] = useState('');
   const [maritalStatus, setMaritalStatus] = useState('');
 
-  // Pagination State (Change pages 1, 2, 3, 4...)
+  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const profilesPerPage = 10;
 
-  // 1. Fetch fresh profiles directly from backend API to ensure Admin added profiles always show
+  // 1. Fetch fresh profiles using centralized API instance
   useEffect(() => {
     const fetchFreshProfiles = async () => {
       try {
-        const res = await axios.get('/api/profiles');
+        const res = await API.get('/profiles');
         let data = res.data;
         if (data.profiles && Array.isArray(data.profiles)) {
           data = data.profiles;
@@ -56,13 +55,11 @@ export default function SearchProfiles() {
     setCurrentPage(1);
   };
 
-  // 2. Flexible Filtering Logic (Ignores missing cases and spaces)
+  // 2. Flexible Filtering Logic
   const filteredProfiles = profilesList.filter((profile) => {
-    // Extract ID safely from any possible backend schema field
     const rawId = profile.memberId || profile.memberID || profile.vtvId || profile.vtvID || profile._id || profile.id || '';
     const cleanId = String(rawId).trim().toLowerCase();
     const searchId = vtvId.trim().toLowerCase();
-
     const matchesId = searchId ? cleanId.includes(searchId) : true;
     
     // District Match
@@ -94,7 +91,7 @@ export default function SearchProfiles() {
     return matchesId && matchesDistrict && matchesOccupation && matchesMarital && matchesAge;
   });
 
-  // 3. Pagination Slices (1 2 3 4 buttons)
+  // 3. Pagination Slices
   const totalProfiles = filteredProfiles.length;
   const totalPages = Math.ceil(totalProfiles / profilesPerPage) || 1;
   const indexOfLastProfile = currentPage * profilesPerPage;
@@ -108,13 +105,15 @@ export default function SearchProfiles() {
     }
   };
 
-  // Helper to resolve Cloudinary/Local images
+  // Helper to extract Cloudinary/Local image URLs safely across schemas
   const getImageUrl = (profile) => {
-    if (profile.profileImage && typeof profile.profileImage === 'object' && profile.profileImage.url) {
-      return profile.profileImage.url;
+    if (profile.profileImage) {
+      if (typeof profile.profileImage === 'string') return profile.profileImage;
+      if (profile.profileImage.url) return profile.profileImage.url;
     }
-    if (typeof profile.profileImage === 'string' && profile.profileImage) {
-      return profile.profileImage;
+    if (profile.photo) {
+      if (typeof profile.photo === 'string') return profile.photo;
+      if (profile.photo.url) return profile.photo.url;
     }
     return profile.img || 'https://via.placeholder.com/300x350?text=No+Image';
   };
@@ -184,6 +183,8 @@ export default function SearchProfiles() {
               <option value="Tiruppur">Tiruppur - திருப்பூர்</option>
               <option value="Dindigul">Dindigul - திண்டுக்கல்</option>
               <option value="Chennai">Chennai - சென்னை</option>
+              <option value="Erode">Erode - ஈரோடு</option>
+              <option value="Coimbatore">Coimbatore - கோயம்புத்தூர்</option>
             </select>
           </div>
 
@@ -239,97 +240,58 @@ export default function SearchProfiles() {
                           <div><span style={{ color: '#888', display: 'block', fontSize: '11px' }}>KULAM DEIVAM</span><strong>{profile.kuladeivam || profile.kulamDeivam || '-'}</strong></div>
                           <div><span style={{ color: '#888', display: 'block', fontSize: '11px' }}>EDUCATION</span><strong>{profile.education || '-'}</strong></div>
                           <div><span style={{ color: '#888', display: 'block', fontSize: '11px' }}>OCCUPATION</span><strong>{profile.occupation || '-'}</strong></div>
-                          <div style={{ gridColumn: 'span 2' }}><span style={{ color: '#888', display: 'block', fontSize: '11px' }}>LOCATION</span><strong>{profile.district || '-'}</strong></div>
+                          <div><span style={{ color: '#888', display: 'block', fontSize: '11px' }}>DISTRICT</span><strong>{profile.district || '-'}</strong></div>
+                          <div><span style={{ color: '#888', display: 'block', fontSize: '11px' }}>MOBILE</span><strong>{profile.mobile || '-'}</strong></div>
                         </div>
                       </div>
-
-                      <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '18px' }}>
-                        <button onClick={() => navigate(`/profile/${profileId}`)} style={{ backgroundColor: '#2e3192', color: '#fff', border: 'none', padding: '8px 20px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' }}>Full Profile</button>
-                        <button onClick={() => setShowLoginModal(true)} style={{ backgroundColor: '#fff', color: '#777', border: '1px solid #ccc', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}>Report</button>
-                      </div>
                     </div>
+
                   </div>
                 );
               })
             )}
           </div>
 
-          {/* NUMBERED PAGINATION (1 2 3 4...) */}
-          {totalProfiles > 0 && totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', marginTop: '35px', flexWrap: 'wrap' }}>
-              
-              {/* Prev Button */}
-              <button
+          {/* PAGINATION BUTTONS */}
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '30px' }}>
+              <button 
+                onClick={() => handlePageChange(currentPage - 1)} 
                 disabled={currentPage === 1}
-                onClick={() => handlePageChange(currentPage - 1)}
-                style={{
-                  padding: '8px 14px',
-                  border: '1px solid #ccc',
-                  backgroundColor: currentPage === 1 ? '#f5f5f5' : '#fff',
-                  color: currentPage === 1 ? '#aaa' : '#333',
-                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                  borderRadius: '4px',
-                  fontSize: '13px',
-                }}
+                style={{ padding: '8px 14px', border: '1px solid #ccc', backgroundColor: '#fff', borderRadius: '4px', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
               >
-                &laquo; Prev
+                Previous
               </button>
-
-              {/* Page Numbers 1 2 3 4 ... */}
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNum) => (
+              {[...Array(totalPages)].map((_, i) => (
                 <button
-                  key={pageNum}
-                  onClick={() => handlePageChange(pageNum)}
+                  key={i + 1}
+                  onClick={() => handlePageChange(i + 1)}
                   style={{
                     padding: '8px 14px',
-                    border: pageNum === currentPage ? '1px solid #7a1c1c' : '1px solid #ccc',
-                    backgroundColor: pageNum === currentPage ? '#7a1c1c' : '#fff',
-                    color: pageNum === currentPage ? '#fff' : '#333',
-                    fontWeight: pageNum === currentPage ? 'bold' : 'normal',
-                    cursor: 'pointer',
+                    border: '1px solid #ccc',
+                    backgroundColor: currentPage === i + 1 ? '#7a1c1c' : '#fff',
+                    color: currentPage === i + 1 ? '#fff' : '#333',
                     borderRadius: '4px',
-                    fontSize: '13px',
-                    minWidth: '36px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
                   }}
                 >
-                  {pageNum}
+                  {i + 1}
                 </button>
               ))}
-
-              {/* Next Button */}
-              <button
+              <button 
+                onClick={() => handlePageChange(currentPage + 1)} 
                 disabled={currentPage === totalPages}
-                onClick={() => handlePageChange(currentPage + 1)}
-                style={{
-                  padding: '8px 14px',
-                  border: '1px solid #ccc',
-                  backgroundColor: currentPage === totalPages ? '#f5f5f5' : '#fff',
-                  color: currentPage === totalPages ? '#aaa' : '#333',
-                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                  borderRadius: '4px',
-                  fontSize: '13px',
-                }}
+                style={{ padding: '8px 14px', border: '1px solid #ccc', backgroundColor: '#fff', borderRadius: '4px', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
               >
-                Next &raquo;
+                Next
               </button>
             </div>
           )}
 
         </div>
+
       </div>
-
-      {/* LOGIN MODAL */}
-      {showLoginModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: '#fff', padding: '30px', borderRadius: '8px', textAlign: 'center', maxWidth: '350px', width: '90%' }}>
-            <div style={{ fontSize: '42px', color: '#f8bb86', marginBottom: '10px' }}>!</div>
-            <h3 style={{ margin: '0 0 10px 0' }}>Login first!</h3>
-            <p style={{ color: '#666', fontSize: '14px', marginBottom: '20px' }}>You need to login to report this profile</p>
-            <button onClick={() => setShowLoginModal(false)} style={{ backgroundColor: '#3085d6', color: '#fff', border: 'none', padding: '8px 25px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>OK</button>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }
