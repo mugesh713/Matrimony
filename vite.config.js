@@ -7,16 +7,11 @@ export default defineConfig({
     loader: 'jsx',
     include: /src\/.*\.js$/, // Force JSX parsing for .js files under src/
   },
-  oxc: {
-    jsx: {
-      runtime: 'automatic',
-    },
-  },
   server: {
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://matrimony-backend-d7cq.onrender.com/',
+        target: 'https://matrimony-backend-d7cq.onrender.com',
         changeOrigin: true,
         secure: false,
       },
