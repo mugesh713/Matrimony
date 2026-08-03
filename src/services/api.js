@@ -8,7 +8,7 @@ const API = axios.create({
   baseURL: cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`,
 });
 
-// Pass JWT token automatically on every request (checks both user and admin tokens)
+// Pass JWT token automatically on every request
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
   if (token) {
