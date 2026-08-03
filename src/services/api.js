@@ -1,12 +1,16 @@
 import axios from 'axios';
 
+// Dynamically construct base URL to avoid hardcoding localhost
+const rawApiUrl = import.meta.env.VITE_API_URL || 'https://matrimony-backend-d7cq.onrender.com';
+const cleanApiUrl = rawApiUrl.replace(/\/$/, ''); // Remove trailing slash if present
+
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: cleanApiUrl.endsWith('/api') ? cleanApiUrl : `${cleanApiUrl}/api`,
 });
 
-// Pass JWT token automatically on every request
+// Pass JWT token automatically on every request (checks both user and admin tokens)
 API.interceptors.request.use((req) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
   if (token) {
     req.headers.Authorization = `Bearer ${token}`;
   }
