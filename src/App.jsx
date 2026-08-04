@@ -23,7 +23,7 @@ const ProtectedAdminRoute = ({ children }) => {
 };
 
 // Custom NavLink without emojis/icons
-function CustomNavLink({ to, children, activeColor = '#e65100' }) {
+function CustomNavLink({ to, children, activeColor = '#e65100', onClick }) {
   const [hovered, setHovered] = useState(false);
   const location = useLocation();
   const isActive = location.pathname === to;
@@ -44,6 +44,7 @@ function CustomNavLink({ to, children, activeColor = '#e65100' }) {
     <Link
       to={to}
       style={style}
+      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -66,7 +67,8 @@ function CustomNavLink({ to, children, activeColor = '#e65100' }) {
 }
 
 function Navbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const rawPic =
     typeof user?.profilePic === 'object'
@@ -86,109 +88,197 @@ function Navbar() {
       .slice(0, 2);
   };
 
+  const closeMenu = () => setMobileMenuOpen(false);
+
   return (
-    <nav
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between', /* Fixed key typo: 'justify' -> 'justifyContent' */
-        alignItems: 'center',
-        padding: '15px 40px',
-        backgroundColor: '#ffffff',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000
-      }}
-    >
-      {/* Brand Logo - Aligned Left */}
-      <Link to="/" style={{ textDecoration: 'none', fontSize: '22px', fontWeight: 'bold', color: '#8b0000' }}>
-        👣 VARAN <span style={{ color: '#d9534f' }}>THEDUM VARAM</span>
-      </Link>
+    <>
+      <style>{`
+        .navbar-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 40px;
+          background-color: #ffffff;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+        }
 
-      {/* Navigation Links & Profile - Aligned Far Right */}
-      <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginLeft: 'auto' }}>
-        <CustomNavLink to="/">HOME</CustomNavLink>
-        <CustomNavLink to="/search">SEARCH PROFILES</CustomNavLink>
-        <CustomNavLink to="/plans">PLANS</CustomNavLink>
-        <CustomNavLink to="/contact">CONTACT US</CustomNavLink>
+        .hamburger-btn {
+          display: none;
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: #8b0000;
+        }
 
-        {user ? (
-          <>
-            {user.role === 'admin' && (
-              <CustomNavLink to="/admin/dashboard" activeColor="#111827">ADMIN PANEL</CustomNavLink>
-            )}
+        .nav-menu {
+          display: flex;
+          gap: 24px;
+          align-items: center;
+          margin-left: auto;
+        }
 
-            {/* Profile Tab */}
-            <Link
-              to="/profile"
-              style={{
-                textDecoration: 'none',
-                color: '#0284c7',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '4px 10px',
-                borderRadius: '20px',
-                transition: 'background-color 0.2s ease',
-                marginLeft: '8px'
-              }}
-            >
-              {profilePicUrl ? (
-                <img
-                  src={profilePicUrl}
-                  alt={displayName}
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    border: '1.5px solid #0284c7'
+        @media (max-width: 900px) {
+          .navbar-container {
+            padding: 15px 20px;
+            flex-wrap: wrap;
+          }
+
+          .hamburger-btn {
+            display: block;
+          }
+
+          .nav-menu {
+            display: ${mobileMenuOpen ? 'flex' : 'none'};
+            flex-direction: column;
+            width: 100%;
+            margin-left: 0;
+            padding-top: 15px;
+            gap: 16px;
+            align-items: flex-start;
+            border-top: 1px solid #f1f5f9;
+            margin-top: 10px;
+          }
+
+          .nav-menu a {
+            width: 100%;
+          }
+        }
+      `}</style>
+
+      <nav className="navbar-container">
+        {/* Brand Logo - Left Aligned */}
+        <Link 
+          to="/" 
+          onClick={closeMenu} 
+          style={{ textDecoration: 'none', fontSize: '20px', fontWeight: 'bold', color: '#8b0000' }}
+        >
+          👣 VARAN <span style={{ color: '#d9534f' }}>THEDUM VARAM</span>
+        </Link>
+
+        {/* Mobile Hamburger Toggle Button */}
+        <button 
+          className="hamburger-btn" 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle navigation menu"
+        >
+          {mobileMenuOpen ? '✕' : '☰'}
+        </button>
+
+        {/* Navigation Links & Profile */}
+        <div className="nav-menu">
+          <CustomNavLink to="/" onClick={closeMenu}>HOME</CustomNavLink>
+          <CustomNavLink to="/search" onClick={closeMenu}>SEARCH PROFILES</CustomNavLink>
+          <CustomNavLink to="/plans" onClick={closeMenu}>PLANS</CustomNavLink>
+          <CustomNavLink to="/contact" onClick={closeMenu}>CONTACT US</CustomNavLink>
+
+          {user ? (
+            <>
+              {user.role === 'admin' && (
+                <CustomNavLink to="/admin/dashboard" activeColor="#111827" onClick={closeMenu}>
+                  ADMIN PANEL
+                </CustomNavLink>
+              )}
+
+              {/* Profile Tab */}
+              <Link
+                to="/profile"
+                onClick={closeMenu}
+                style={{
+                  textDecoration: 'none',
+                  color: '#0284c7',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  backgroundColor: '#f0f9ff',
+                  border: '1px solid #bae6fd',
+                  transition: 'background-color 0.2s ease'
+                }}
+              >
+                {profilePicUrl ? (
+                  <img
+                    src={profilePicUrl}
+                    alt={displayName}
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '1.5px solid #0284c7'
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      backgroundColor: '#e0f2fe',
+                      color: '#0284c7',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '13px',
+                      fontWeight: '700',
+                      border: '1.5px solid #0284c7'
+                    }}
+                  >
+                    {getInitials(user.name)}
+                  </div>
+                )}
+                <span style={{ fontWeight: '700', fontSize: '14px' }}>{displayName.toUpperCase()}</span>
+              </Link>
+
+              {/* Optional Logout Button inside navbar */}
+              {logout && (
+                <button
+                  onClick={() => {
+                    logout();
+                    closeMenu();
                   }}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                  }}
-                />
-              ) : (
-                <div
                   style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: '#e0f2fe',
-                    color: '#0284c7',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    backgroundColor: 'transparent',
+                    color: '#ef4444',
+                    border: '1px solid #fca5a5',
+                    padding: '6px 14px',
+                    borderRadius: '20px',
                     fontSize: '13px',
                     fontWeight: '700',
-                    border: '1.5px solid #0284c7'
+                    cursor: 'pointer'
                   }}
                 >
-                  {getInitials(user.name)}
-                </div>
+                  LOGOUT
+                </button>
               )}
-              <span style={{ fontWeight: '700', fontSize: '14px' }}>{displayName.toUpperCase()}</span>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              onClick={closeMenu}
+              style={{
+                backgroundColor: '#007bff',
+                color: '#ffffff',
+                padding: '8px 20px',
+                borderRadius: '5px',
+                textDecoration: 'none',
+                fontWeight: '700',
+                fontSize: '14px'
+              }}
+            >
+              🔒 Login
             </Link>
-          </>
-        ) : (
-          <Link
-            to="/login"
-            style={{
-              backgroundColor: '#007bff',
-              color: '#ffffff',
-              padding: '8px 20px',
-              borderRadius: '5px',
-              textDecoration: 'none',
-              fontWeight: '700',
-              fontSize: '14px',
-              marginLeft: '8px'
-            }}
-          >
-            🔒 Login
-          </Link>
-        )}
-      </div>
-    </nav>
+          )}
+        </div>
+      </nav>
+    </>
   );
 }
 
