@@ -32,46 +32,91 @@ export default function Plans() {
   ];
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', padding: '60px 20px', fontFamily: "sans-serif" }}>
-      <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 50px' }}>
-        <p style={{ color: '#991b1b', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase', fontSize: '13px' }}>MEMBERSHIP PACKAGES</p>
-        <h1 style={{ fontSize: '38px', color: '#0f172a', margin: '10px 0', fontFamily: 'Georgia, serif' }}>Choose the Right Plan for You</h1>
-        <p style={{ color: '#64748b', fontSize: '16px' }}>Unlock genuine contacts and find your life partner faster with our verified premium services.</p>
+    <div className="plans-wrapper">
+      <style>{`
+        .plans-wrapper {
+          background-color: #f8fafc;
+          min-height: 100vh;
+          padding: 60px 20px;
+          font-family: system-ui, -apple-system, sans-serif;
+          box-sizing: border-box;
+        }
+        .plans-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 30px;
+          max-width: 1100px;
+          margin: 0 auto;
+        }
+        .plans-title {
+          font-size: 38px;
+          color: #0f172a;
+          margin: 10px 0;
+          font-family: Georgia, serif;
+        }
+        @media (max-width: 600px) {
+          .plans-wrapper {
+            padding: 30px 15px;
+          }
+          .plans-title {
+            font-size: 28px;
+          }
+          .plans-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+          }
+        }
+      `}</style>
+
+      <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 40px' }}>
+        <p style={{ color: '#991b1b', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase', fontSize: '13px' }}>
+          MEMBERSHIP PACKAGES
+        </p>
+        <h1 className="plans-title">Choose the Right Plan for You</h1>
+        <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.5' }}>
+          Unlock genuine contacts and find your life partner faster with our verified premium services.
+        </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', maxWidth: '1100px', margin: '0 auto' }}>
+      <div className="plans-grid">
         {plans.map((plan, idx) => (
-          <div key={idx} style={{
-            backgroundColor: '#fff',
-            borderRadius: '16px',
-            padding: '35px 25px',
-            boxShadow: '0 10px 25px -5px rgba(0,0,0,0.08)',
-            border: plan.badge ? '2px solid #991b1b' : '1px solid #e2e8f0',
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-            justify: 'space-between'
-          }}>
+          <div
+            key={idx}
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: '16px',
+              padding: '30px 20px',
+              boxShadow: '0 10px 25px -5px rgba(0,0,0,0.08)',
+              border: plan.badge ? '2px solid #991b1b' : '1px solid #e2e8f0',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              boxSizing: 'border-box'
+            }}
+          >
             {plan.badge && (
-              <span style={{
-                position: 'absolute',
-                top: '-14px',
-                right: '25px',
-                backgroundColor: '#991b1b',
-                color: '#fff',
-                fontSize: '11px',
-                fontWeight: '700',
-                padding: '4px 12px',
-                borderRadius: '20px',
-                letterSpacing: '1px'
-              }}>
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-14px',
+                  right: '25px',
+                  backgroundColor: '#991b1b',
+                  color: '#fff',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  padding: '4px 12px',
+                  borderRadius: '20px',
+                  letterSpacing: '1px'
+                }}
+              >
                 {plan.badge}
               </span>
             )}
             <div>
-              <h3 style={{ fontSize: '22px', color: plan.color, marginBottom: '10px' }}>{plan.name}</h3>
+              <h3 style={{ fontSize: '20px', color: plan.color, marginBottom: '10px' }}>{plan.name}</h3>
               <div style={{ margin: '15px 0' }}>
-                <span style={{ fontSize: '36px', fontWeight: '800', color: '#0f172a' }}>{plan.price}</span>
+                <span style={{ fontSize: '32px', fontWeight: '800', color: '#0f172a' }}>{plan.price}</span>
                 <span style={{ color: '#64748b', fontSize: '14px' }}> / {plan.duration}</span>
               </div>
               <ul style={{ listStyle: 'none', padding: 0, margin: '25px 0', textAlign: 'left' }}>
