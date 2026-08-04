@@ -7,7 +7,6 @@ export default function SearchProfiles() {
   const navigate = useNavigate();
   const contextData = useApp();
   
-  // Local state to store fetched profiles
   const [profilesList, setProfilesList] = useState([]);
 
   // Filter States
@@ -21,7 +20,6 @@ export default function SearchProfiles() {
   const [currentPage, setCurrentPage] = useState(1);
   const profilesPerPage = 10;
 
-  // 1. Fetch fresh profiles using centralized API instance
   useEffect(() => {
     const fetchFreshProfiles = async () => {
       try {
@@ -36,7 +34,7 @@ export default function SearchProfiles() {
           setProfilesList(contextData.profiles);
         }
       } catch (err) {
-        console.error("Error fetching profiles directly:", err);
+        console.error("Error fetching profiles:", err);
         if (contextData && Array.isArray(contextData.profiles)) {
           setProfilesList(contextData.profiles);
         }
@@ -55,29 +53,24 @@ export default function SearchProfiles() {
     setCurrentPage(1);
   };
 
-  // 2. Flexible Filtering Logic
   const filteredProfiles = profilesList.filter((profile) => {
     const rawId = profile.memberId || profile.memberID || profile.vtvId || profile.vtvID || profile._id || profile.id || '';
     const cleanId = String(rawId).trim().toLowerCase();
     const searchId = vtvId.trim().toLowerCase();
     const matchesId = searchId ? cleanId.includes(searchId) : true;
     
-    // District Match
     const cleanDistrict = String(profile.district || '').trim().toLowerCase();
     const searchDistrict = district.trim().toLowerCase();
     const matchesDistrict = searchDistrict ? cleanDistrict === searchDistrict : true;
 
-    // Occupation Match
     const cleanOccupation = String(profile.occupation || '').trim().toLowerCase();
     const searchOccupation = occupation.trim().toLowerCase();
     const matchesOccupation = searchOccupation ? cleanOccupation.includes(searchOccupation) : true;
 
-    // Marital Status Match
     const cleanMarital = String(profile.maritalStatus || profile.marital_status || '').trim().toLowerCase();
     const searchMarital = maritalStatus.trim().toLowerCase();
     const matchesMarital = searchMarital ? cleanMarital === searchMarital : true;
 
-    // Age Range Check
     let matchesAge = true;
     if (ageRange && profile.age) {
       const numericAge = parseInt(profile.age, 10);
@@ -91,7 +84,6 @@ export default function SearchProfiles() {
     return matchesId && matchesDistrict && matchesOccupation && matchesMarital && matchesAge;
   });
 
-  // 3. Pagination Slices
   const totalProfiles = filteredProfiles.length;
   const totalPages = Math.ceil(totalProfiles / profilesPerPage) || 1;
   const indexOfLastProfile = currentPage * profilesPerPage;
@@ -105,7 +97,6 @@ export default function SearchProfiles() {
     }
   };
 
-  // Helper to extract Cloudinary/Local image URLs safely across schemas
   const getImageUrl = (profile) => {
     if (profile.profileImage) {
       if (typeof profile.profileImage === 'string') return profile.profileImage;
@@ -121,7 +112,6 @@ export default function SearchProfiles() {
   return (
     <div style={{ backgroundColor: '#faf9f6', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", color: '#333', minHeight: '100vh', paddingBottom: '50px' }}>
       
-      {/* BANNER HEADER */}
       <div style={{ backgroundColor: '#7a1c1c', color: '#fff', textAlign: 'center', padding: '20px 10px' }}>
         <h2 style={{ margin: 0, fontFamily: 'serif', fontSize: '28px', color: '#fbe29d' }}>
           இனிய திருமணங்கள்
@@ -144,10 +134,9 @@ export default function SearchProfiles() {
         </button>
       </div>
 
-      {/* MAIN CONTAINER */}
       <div style={{ maxWidth: '1200px', margin: '30px auto 0 auto', padding: '0 20px', display: 'flex', gap: '30px', flexWrap: 'wrap' }}>
         
-        {/* LEFT FILTERS */}
+        {/* FILTERS */}
         <div style={{ flex: '1', minWidth: '280px', backgroundColor: '#fff', padding: '22px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', height: 'fit-content' }}>
           <h3 style={{ margin: '0 0 18px 0', fontSize: '16px', color: '#8b0000', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
             🔍 Search Filter (தேடல்)
@@ -193,9 +182,8 @@ export default function SearchProfiles() {
           </button>
         </div>
 
-        {/* RIGHT PROFILES LIST */}
+        {/* PROFILES LIST */}
         <div style={{ flex: '2.8', minWidth: '300px' }}>
-          
           <div style={{ marginBottom: '15px', fontSize: '14px', color: '#555' }}>
             Showing <strong>{totalProfiles === 0 ? 0 : indexOfFirstProfile + 1} to {Math.min(indexOfLastProfile, totalProfiles)}</strong> of <strong>{totalProfiles}</strong> profiles
           </div>
@@ -208,13 +196,13 @@ export default function SearchProfiles() {
               </div>
             ) : (
               currentProfiles.map((profile) => {
-                const profileId = profile._id || profile.id || profile.memberId;
+                // Ensure MongoDB ID is retrieved properly for routing
+                const routeId = profile._id || profile.id || profile.memberId;
                 const memberDisplayId = profile.memberId || profile.memberID || profile.vtvId || profile.id;
                 
                 return (
-                  <div key={profileId} style={{ backgroundColor: '#fff', border: '1px solid #e2e2e2', borderRadius: '8px', display: 'flex', flexWrap: 'wrap', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                  <div key={routeId} style={{ backgroundColor: '#fff', border: '1px solid #e2e2e2', borderRadius: '8px', display: 'flex', flexWrap: 'wrap', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
                     
-                    {/* PHOTO */}
                     <div style={{ flex: '1', minWidth: '220px', maxWidth: '270px', backgroundColor: '#f0f0f0' }}>
                       <img 
                         src={getImageUrl(profile)} 
@@ -223,7 +211,6 @@ export default function SearchProfiles() {
                       />
                     </div>
 
-                    {/* DETAILS */}
                     <div style={{ flex: '2', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                       <div>
                         <h3 style={{ margin: 0, fontSize: '22px', color: '#222' }}>{profile.name}</h3>
@@ -245,10 +232,9 @@ export default function SearchProfiles() {
                         </div>
                       </div>
 
-                      {/* FULL PROFILE VIEW BUTTON */}
                       <div style={{ marginTop: '20px', textAlign: 'right' }}>
                         <button
-                          onClick={() => navigate(`/profile/${profileId}`)}
+                          onClick={() => navigate(`/profile/${routeId}`)}
                           style={{
                             backgroundColor: '#7a1c1c',
                             color: '#fff',
@@ -259,7 +245,6 @@ export default function SearchProfiles() {
                             fontSize: '13px',
                             cursor: 'pointer',
                             boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-                            transition: 'background-color 0.2s ease',
                           }}
                         >
                           View Full Profile ➔
@@ -274,7 +259,6 @@ export default function SearchProfiles() {
             )}
           </div>
 
-          {/* PAGINATION BUTTONS */}
           {totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '30px' }}>
               <button 
