@@ -70,7 +70,7 @@ export default function AdminPanel() {
 
   const handleEditClick = (profile) => {
     setEditingId(profile._id);
-    setImageFile(null); // Reset newly selected file state
+    setImageFile(null);
     setFormData({
       profileFor: profile.profileFor || 'Groom',
       name: profile.name || '',
@@ -130,7 +130,6 @@ export default function AdminPanel() {
     });
 
     if (imageFile) {
-      // Append for both key naming conventions to guarantee backend multer mapping
       submitData.append('profileImage', imageFile);
       submitData.append('photo', imageFile);
     }
@@ -170,7 +169,6 @@ export default function AdminPanel() {
     }
   };
 
-  // Helper function to extract image URL safely across schemas
   const getImageUrl = (profile) => {
     if (profile.profileImage) {
       if (typeof profile.profileImage === 'string') return profile.profileImage;
@@ -184,215 +182,307 @@ export default function AdminPanel() {
   };
 
   return (
-    <div style={{ maxWidth: '1100px', margin: '20px auto', padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
-      <h2 style={{ borderBottom: '2px solid #7a1c1c', paddingBottom: '10px', color: '#7a1c1c' }}>
+    <div className="admin-container">
+      <style>{`
+        .admin-container {
+          max-width: 1100px;
+          margin: 20px auto;
+          padding: 20px;
+          background-color: #fff;
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          box-sizing: border-box;
+        }
+        .admin-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 15px;
+        }
+        .admin-input {
+          width: 100%;
+          padding: 10px;
+          border-radius: 6px;
+          border: 1px solid #ccc;
+          margin-top: 4px;
+          box-sizing: border-box;
+          font-size: 14px;
+        }
+        .admin-label {
+          font-size: 13px;
+          font-weight: 600;
+          color: #333;
+        }
+        .admin-section-header {
+          margin-top: 25px;
+          margin-bottom: 12px;
+          color: #7a1c1c;
+          border-bottom: 1px solid #eee;
+          padding-bottom: 6px;
+        }
+        .btn-group {
+          margin-top: 25px;
+          display: flex;
+          gap: 15px;
+          flex-wrap: wrap;
+        }
+        .btn-primary {
+          background-color: #487d83;
+          color: #fff;
+          padding: 12px 25px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+          flex: 1;
+          min-width: 180px;
+        }
+        .btn-secondary {
+          background-color: #6c757d;
+          color: #fff;
+          padding: 12px 25px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          flex: 1;
+          min-width: 120px;
+        }
+        .table-responsive {
+          width: 100%;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          margin-top: 15px;
+        }
+        .admin-table {
+          width: 100%;
+          border-collapse: collapse;
+          min-width: 650px;
+        }
+        .admin-th {
+          padding: 12px;
+          border-bottom: 2px solid #ddd;
+          background-color: #f8f9fa;
+          text-align: left;
+          font-size: 14px;
+        }
+        .admin-td {
+          padding: 10px;
+          vertical-align: middle;
+          border-bottom: 1px solid #eee;
+          font-size: 14px;
+        }
+        @media (max-width: 600px) {
+          .admin-container {
+            padding: 15px;
+            margin: 10px;
+          }
+          .admin-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <h2 style={{ borderBottom: '2px solid #7a1c1c', paddingBottom: '10px', color: '#7a1c1c', fontSize: '22px' }}>
         {editingId ? '✏️ Edit Profile' : '➕ Add New Profile'}
       </h2>
 
       <form onSubmit={handleSubmit}>
         {/* BASIC DETAILS */}
-        <h4 style={sectionHeaderStyle}>👤 Basic Details</h4>
-        <div style={gridStyle}>
+        <h4 className="admin-section-header">👤 Basic Details</h4>
+        <div className="admin-grid">
           <div>
-            <label style={labelStyle}>Profile For *</label>
-            <select name="profileFor" value={formData.profileFor} onChange={handleInputChange} style={inputStyle}>
+            <label className="admin-label">Profile For *</label>
+            <select name="profileFor" value={formData.profileFor} onChange={handleInputChange} className="admin-input">
               <option value="Bride">Bride</option>
               <option value="Groom">Groom</option>
             </select>
           </div>
           <div>
-            <label style={labelStyle}>Name *</label>
-            <input name="name" value={formData.name} onChange={handleInputChange} required style={inputStyle} />
+            <label className="admin-label">Name *</label>
+            <input name="name" value={formData.name} onChange={handleInputChange} required className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Gender *</label>
-            <select name="gender" value={formData.gender} onChange={handleInputChange} style={inputStyle}>
+            <label className="admin-label">Gender *</label>
+            <select name="gender" value={formData.gender} onChange={handleInputChange} className="admin-input">
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
           </div>
           <div>
-            <label style={labelStyle}>Age</label>
-            <input type="number" name="age" value={formData.age} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Age</label>
+            <input type="number" name="age" value={formData.age} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Height (e.g. 5ft 10in / 178 cms)</label>
-            <input name="height" value={formData.height} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Height (e.g. 5ft 10in / 178 cms)</label>
+            <input name="height" value={formData.height} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Marital Status</label>
-            <select name="maritalStatus" value={formData.maritalStatus} onChange={handleInputChange} style={inputStyle}>
+            <label className="admin-label">Marital Status</label>
+            <select name="maritalStatus" value={formData.maritalStatus} onChange={handleInputChange} className="admin-input">
               <option value="Single">Single</option>
               <option value="Married">Married</option>
               <option value="Divorced">Divorced</option>
             </select>
           </div>
           <div>
-            <label style={labelStyle}>Mobile Number *</label>
-            <input name="mobile" value={formData.mobile} onChange={handleInputChange} required style={inputStyle} />
+            <label className="admin-label">Mobile Number *</label>
+            <input name="mobile" value={formData.mobile} onChange={handleInputChange} required className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Profile Photo (Cloudinary)</label>
-            <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} style={inputStyle} />
+            <label className="admin-label">Profile Photo (Cloudinary)</label>
+            <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} className="admin-input" />
           </div>
         </div>
 
         {/* RELIGIOUS & COMMUNITY DETAILS */}
-        <h4 style={sectionHeaderStyle}>🛕 Religious & Community Details</h4>
-        <div style={gridStyle}>
+        <h4 className="admin-section-header">🛕 Religious & Community Details</h4>
+        <div className="admin-grid">
           <div>
-            <label style={labelStyle}>Kulam (குலம்)</label>
-            <input name="kulam" value={formData.kulam} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Kulam (குலம்)</label>
+            <input name="kulam" value={formData.kulam} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Kuladeivam (குலதெய்வம்)</label>
-            <input name="kuladeivam" value={formData.kuladeivam} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Kuladeivam (குலதெய்வம்)</label>
+            <input name="kuladeivam" value={formData.kuladeivam} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Caste</label>
-            <input name="caste" value={formData.caste} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Caste</label>
+            <input name="caste" value={formData.caste} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Star (நட்சத்திரம்)</label>
-            <input name="star" value={formData.star} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Star (நட்சத்திரம்)</label>
+            <input name="star" value={formData.star} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Rasi (ராசி)</label>
-            <input name="rasi" value={formData.rasi} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Rasi (ராசி)</label>
+            <input name="rasi" value={formData.rasi} onChange={handleInputChange} className="admin-input" />
           </div>
         </div>
 
         {/* EDUCATION & OCCUPATION */}
-        <h4 style={sectionHeaderStyle}>🎓 Education & Occupation</h4>
-        <div style={gridStyle}>
+        <h4 className="admin-section-header">🎓 Education & Occupation</h4>
+        <div className="admin-grid">
           <div>
-            <label style={labelStyle}>Education (கல்வி)</label>
-            <input name="education" value={formData.education} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Education (கல்வி)</label>
+            <input name="education" value={formData.education} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Occupation (தொழில்)</label>
-            <input name="occupation" value={formData.occupation} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Occupation (தொழில்)</label>
+            <input name="occupation" value={formData.occupation} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Company</label>
-            <input name="company" value={formData.company} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Company</label>
+            <input name="company" value={formData.company} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Annual Income</label>
-            <input name="annualIncome" value={formData.annualIncome} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Annual Income</label>
+            <input name="annualIncome" value={formData.annualIncome} onChange={handleInputChange} className="admin-input" />
           </div>
         </div>
 
         {/* FAMILY DETAILS */}
-        <h4 style={sectionHeaderStyle}>👨‍👩‍👧‍👦 Family Details</h4>
-        <div style={gridStyle}>
+        <h4 className="admin-section-header">👨‍👩‍👧‍👦 Family Details</h4>
+        <div className="admin-grid">
           <div>
-            <label style={labelStyle}>Father's Name</label>
-            <input name="fatherName" value={formData.fatherName} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Father's Name</label>
+            <input name="fatherName" value={formData.fatherName} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Mother's Name</label>
-            <input name="motherName" value={formData.motherName} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Mother's Name</label>
+            <input name="motherName" value={formData.motherName} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Parents Contact Number</label>
-            <input name="parentContact" value={formData.parentContact} onChange={handleInputChange} style={inputStyle} placeholder="e.g. +91 9876543210" />
+            <label className="admin-label">Parents Contact Number</label>
+            <input name="parentContact" value={formData.parentContact} onChange={handleInputChange} className="admin-input" placeholder="e.g. +91 9876543210" />
           </div>
         </div>
 
         {/* LOCATION */}
-        <h4 style={sectionHeaderStyle}>📍 Location Details</h4>
-        <div style={gridStyle}>
+        <h4 className="admin-section-header">📍 Location Details</h4>
+        <div className="admin-grid">
           <div>
-            <label style={labelStyle}>District *</label>
-            <input name="district" value={formData.district} onChange={handleInputChange} required style={inputStyle} />
+            <label className="admin-label">District *</label>
+            <input name="district" value={formData.district} onChange={handleInputChange} required className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>State</label>
-            <input name="state" value={formData.state} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">State</label>
+            <input name="state" value={formData.state} onChange={handleInputChange} className="admin-input" />
           </div>
           <div>
-            <label style={labelStyle}>Address</label>
-            <input name="address" value={formData.address} onChange={handleInputChange} style={inputStyle} />
+            <label className="admin-label">Address</label>
+            <input name="address" value={formData.address} onChange={handleInputChange} className="admin-input" />
           </div>
         </div>
 
         {/* ADDITIONAL DESCRIPTION */}
-        <h4 style={sectionHeaderStyle}>📝 Additional Information</h4>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div>
-            <label style={labelStyle}>Profile Description / Notes</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows={3}
-              style={{ ...inputStyle, resize: 'vertical' }}
-              placeholder="Enter additional profile details or special notes..."
-            />
-          </div>
+        <h4 className="admin-section-header">📝 Additional Information</h4>
+        <div>
+          <label className="admin-label">Profile Description / Notes</label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            rows={3}
+            className="admin-input"
+            style={{ resize: 'vertical' }}
+            placeholder="Enter additional profile details or special notes..."
+          />
         </div>
 
         {/* BUTTONS */}
-        <div style={{ marginTop: '25px', display: 'flex', gap: '15px' }}>
-          <button type="submit" disabled={loading} style={{ backgroundColor: '#487d83', color: '#fff', padding: '12px 25px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+        <div className="btn-group">
+          <button type="submit" disabled={loading} className="btn-primary">
             {loading ? 'Processing...' : editingId ? '🔄 Update Profile' : '🚀 Save & Publish Profile'}
           </button>
           {editingId && (
-            <button type="button" onClick={handleCancelEdit} style={{ backgroundColor: '#6c757d', color: '#fff', padding: '12px 25px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+            <button type="button" onClick={handleCancelEdit} className="btn-secondary">
               Cancel
             </button>
           )}
         </div>
       </form>
 
-      <hr style={{ margin: '40px 0' }} />
+      <hr style={{ margin: '40px 0', borderColor: '#eee' }} />
 
       {/* REGISTERED PROFILES TABLE */}
-      <h3>📋 Registered Profiles List ({profiles.length})</h3>
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f2f2f2', textAlign: 'left' }}>
-            <th style={thStyle}>Photo</th>
-            <th style={thStyle}>Member ID</th>
-            <th style={thStyle}>Name</th>
-            <th style={thStyle}>Parents Contact</th>
-            <th style={thStyle}>District</th>
-            <th style={thStyle}>Mobile</th>
-            <th style={thStyle}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {profiles.map((item) => (
-            <tr key={item._id} style={{ borderBottom: '1px solid #ddd' }}>
-              <td style={tdStyle}>
-                <img src={getImageUrl(item)} alt={item.name} style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '50%' }} />
-              </td>
-              <td style={{ ...tdStyle, color: '#0056b3', fontWeight: 'bold' }}>{item.memberId || item._id}</td>
-              <td style={tdStyle}>{item.name}</td>
-              <td style={tdStyle}>{item.parentContact || '-'}</td>
-              <td style={tdStyle}>{item.district}</td>
-              <td style={tdStyle}>{item.mobile}</td>
-              <td style={tdStyle}>
-                <button onClick={() => handleEditClick(item)} style={{ backgroundColor: '#007bff', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', marginRight: '6px' }}>
-                  Edit
-                </button>
-                <button onClick={() => handleDelete(item._id)} style={{ backgroundColor: '#dc3545', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}>
-                  Delete
-                </button>
-              </td>
+      <h3 style={{ fontSize: '18px', color: '#333' }}>📋 Registered Profiles List ({profiles.length})</h3>
+      <div className="table-responsive">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th className="admin-th">Photo</th>
+              <th className="admin-th">Member ID</th>
+              <th className="admin-th">Name</th>
+              <th className="admin-th">Parents Contact</th>
+              <th className="admin-th">District</th>
+              <th className="admin-th">Mobile</th>
+              <th className="admin-th">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {profiles.map((item) => (
+              <tr key={item._id}>
+                <td className="admin-td">
+                  <img src={getImageUrl(item)} alt={item.name} style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '50%' }} />
+                </td>
+                <td className="admin-td" style={{ color: '#0056b3', fontWeight: 'bold' }}>{item.memberId || item._id}</td>
+                <td className="admin-td">{item.name}</td>
+                <td className="admin-td">{item.parentContact || '-'}</td>
+                <td className="admin-td">{item.district}</td>
+                <td className="admin-td">{item.mobile}</td>
+                <td className="admin-td" style={{ whiteSpace: 'nowrap' }}>
+                  <button onClick={() => handleEditClick(item)} style={{ backgroundColor: '#007bff', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', marginRight: '6px' }}>
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(item._id)} style={{ backgroundColor: '#dc3545', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}>
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
-
-// Inline Styles
-const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' };
-const inputStyle = { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc', marginTop: '4px', boxSizing: 'border-box' };
-const labelStyle = { fontSize: '13px', fontWeight: '600' };
-const sectionHeaderStyle = { marginTop: '20px', marginBottom: '10px', color: '#333' };
-const thStyle = { padding: '12px', borderBottom: '2px solid #ddd' };
-const tdStyle = { padding: '10px', verticalAlign: 'middle' };
