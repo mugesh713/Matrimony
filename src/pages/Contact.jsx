@@ -3,11 +3,47 @@ import React, { useState } from 'react';
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setFormData({ name: '', email: '', phone: '', message: '' });
+    setLoading(true);
+    setErrorMsg('');
+
+    // Prepare payload using your Web3Forms Access Key
+    const payload = {
+      access_key: 'c0c73370-09c9-46e5-a720-a12e1021a418',
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone || 'Not provided',
+      message: formData.message,
+      subject: `New Contact Inquiry from ${formData.name}`,
+    };
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSubmitted(true);
+        setFormData({ name: '', email: '', phone: '', message: '' });
+      } else {
+        setErrorMsg(result.message || 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      setErrorMsg('Network error. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,6 +88,11 @@ export default function Contact() {
           font-weight: bold;
           cursor: pointer;
           width: 100%;
+          transition: background-color 0.2s;
+        }
+        .submit-btn:disabled {
+          background-color: #9ca3af;
+          cursor: not-allowed;
         }
         @media (max-width: 600px) {
           .contact-wrapper { padding: 25px 15px; }
@@ -83,7 +124,7 @@ export default function Contact() {
             <div style={{ fontSize: '24px' }}>📞</div>
             <div>
               <strong style={{ display: 'block', fontSize: '15px' }}>Phone / WhatsApp</strong>
-              <span style={{ color: '#666', fontSize: '14px' }}>+91 98765 43210</span>
+              <span style={{ color: '#666', fontSize: '14px' }}>+91 94455 55941</span>
             </div>
           </div>
 
@@ -91,7 +132,7 @@ export default function Contact() {
             <div style={{ fontSize: '24px' }}>✉️</div>
             <div>
               <strong style={{ display: 'block', fontSize: '15px' }}>Email Support</strong>
-              <span style={{ color: '#666', fontSize: '14px' }}>support@matrimony.com</span>
+              <span style={{ color: '#666', fontSize: '14px' }}>help@varam.app</span>
             </div>
           </div>
 
@@ -109,8 +150,14 @@ export default function Contact() {
           <h3 style={{ margin: '0 0 20px 0', fontSize: '20px', color: '#1a1a1a' }}>Send Us a Message</h3>
 
           {submitted && (
-            <div style={{ backgroundColor: '#f0fdf4', color: '#166534', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
-              ✓ Thank you! Your message has been sent.
+            <div style={{ backgroundColor: '#f0fdf4', color: '#166534', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', border: '1px solid #bbf7d0' }}>
+              ✓ Thank you! Your message has been sent to our support team.
+            </div>
+          )}
+
+          {errorMsg && (
+            <div style={{ backgroundColor: '#fef2f2', color: '#991b1b', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', border: '1px solid #fecaca' }}>
+              ✕ {errorMsg}
             </div>
           )}
 
@@ -153,8 +200,8 @@ export default function Contact() {
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
             />
 
-            <button type="submit" className="submit-btn">
-              Send Message
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? 'Sending...' : 'Send Message'}
             </button>
           </form>
         </div>
