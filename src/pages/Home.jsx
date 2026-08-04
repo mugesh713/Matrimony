@@ -60,17 +60,7 @@ export default function Home() {
       `}</style>
 
       {/* 1. TOP UTILITY HEADER BAR */}
-      <header className="bg-[#2d1810] text-slate-200 text-xs sm:text-sm px-4 sm:px-10 py-2.5 flex flex-col sm:flex-row justify-between items-center gap-2 border-b border-white/10">
-        <div className="flex gap-4 font-medium">
-          <span className="cursor-pointer hover:text-amber-400 transition">🔍 About</span>
-          <span className="cursor-pointer hover:text-amber-400 transition">FAQ</span>
-          <span className="cursor-pointer hover:text-amber-400 transition">Contact</span>
-        </div>
-        <div className="flex gap-4 opacity-90 text-xs">
-          <span>📞 +91 94455 55941</span>
-          <span>✉️ help@varam.app</span>
-        </div>
-      </header>
+      
 
       {/* 2. HERO SECTION */}
       <section className="relative min-h-[550px] sm:min-h-[580px] flex flex-col justify-center items-center text-white text-center px-4 py-10 sm:py-16 overflow-hidden">
