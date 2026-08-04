@@ -53,7 +53,20 @@ export default function Register() {
 
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
+      <style>{`
+        @media (max-width: 480px) {
+          .reg-card {
+            padding: 20px 16px !important;
+            border-radius: 12px !important;
+          }
+          .reg-gender-btn {
+            padding: 8px 4px !important;
+            font-size: 12px !important;
+          }
+        }
+      `}</style>
+
+      <div style={styles.card} className="reg-card">
         <div style={styles.header}>
           <h2 style={styles.title}>Create Account</h2>
           <p style={styles.subtitle}>Join us today! Fill in your details below.</p>
@@ -62,7 +75,6 @@ export default function Register() {
         {error && <div style={styles.errorBadge}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form}>
-          {/* Avatar Upload with Preview */}
           <div style={styles.avatarContainer}>
             <label htmlFor="profilePic" style={styles.avatarLabel}>
               {preview ? (
@@ -126,6 +138,7 @@ export default function Register() {
                 <button
                   type="button"
                   key={g}
+                  className="reg-gender-btn"
                   style={{
                     ...styles.genderBtn,
                     ...(formData.gender === g ? styles.genderBtnActive : {}),
@@ -162,7 +175,8 @@ const styles = {
     justifyContent: 'center',
     backgroundColor: '#f4f7fe',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    padding: '20px',
+    padding: '16px',
+    boxSizing: 'border-box',
   },
   card: {
     width: '100%',
@@ -186,7 +200,7 @@ const styles = {
   subtitle: {
     marginTop: '6px',
     fontSize: '14px',
-    color: '#a3114f' ? '#a3aed0' : '#8f9bba',
+    color: '#a3aed0',
   },
   errorBadge: {
     backgroundColor: '#fff2f2',
@@ -246,7 +260,8 @@ const styles = {
     border: '1px solid #e0e5f2',
     fontSize: '14px',
     outline: 'none',
-    transition: 'border-color 0.2s',
+    boxSizing: 'border-box',
+    width: '100%'
   },
   genderGroup: {
     display: 'flex',
