@@ -138,11 +138,7 @@ export default function Home({ user: propUser, onLogout }) {
       `}</style>
 
       {/* 1. TOP UTILITY STRIP FOR PHONE / EMAIL */}
-      <div style={{ backgroundColor: '#2d1810', color: '#e2e8f0', padding: '6px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px' }}>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <span style={{ cursor: 'pointer' }} onClick={() => navigate('/about')}>🔍 About</span>
-          <span style={{ cursor: 'pointer' }} onClick={() => navigate('/faq')}>FAQ</span>
-        </div>
+      
         <div style={{ display: 'flex', gap: '16px' }}>
           <a href="tel:+919445555941" style={{ color: '#e2e8f0', textDecoration: 'none' }}>📞 +91 94455 55941</a>
           <a href="mailto:help@varam.app" style={{ color: '#e2e8f0', textDecoration: 'none' }}>✉️ help@varam.app</a>
