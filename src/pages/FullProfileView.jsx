@@ -46,24 +46,54 @@ export default function FullProfileView() {
     );
   }
 
-  const imageUrl = profile.profileImage?.url || 'https://via.placeholder.com/300x380?text=No+Photo';
+  const imageUrl = profile.profileImage?.url || profile.profileImage || profile.photo?.url || profile.photo || 'https://via.placeholder.com/300x380?text=No+Photo';
 
   return (
     <div style={styles.pageWrapper}>
-      <div style={styles.cardContainer}>
+      {/* Mobile Responsive Global Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .profile-header-container {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+          }
+          .profile-img-style {
+            width: 100% !important;
+            max-width: 280px !important;
+            height: 320px !important;
+          }
+          .badge-group-container {
+            justify-content: center !important;
+          }
+          .sections-grid-container {
+            grid-template-columns: 1fr !important;
+          }
+          .card-padding-override {
+            padding: 16px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .two-column-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+
+      <div style={styles.cardContainer} className="card-padding-override">
         <button onClick={() => navigate(-1)} style={styles.backButton}>
           &larr; Back
         </button>
 
-        <div style={styles.profileHeader}>
+        <div style={styles.profileHeader} className="profile-header-container">
           <div style={styles.imageWrapper}>
-            <img src={imageUrl} alt={profile.name} style={styles.profileImage} />
+            <img src={imageUrl} alt={profile.name} style={styles.profileImage} className="profile-img-style" />
           </div>
 
           <div style={styles.headerInfo}>
             <div>
-              <div style={styles.badgeGroup}>
-                <span style={styles.idBadge}>ID: {profile.memberId}</span>
+              <div style={styles.badgeGroup} className="badge-group-container">
+                <span style={styles.idBadge}>ID: {profile.memberId || profile.vtvId}</span>
                 {profile.maritalStatus && (
                   <span style={styles.statusBadge}>{profile.maritalStatus}</span>
                 )}
@@ -77,7 +107,6 @@ export default function FullProfileView() {
 
             <div style={styles.headerDetailsGrid}>
               <DetailItem label="Mobile" value={profile.mobile} />
-              {/* Fallback check in case parentContact was created recently */}
               <DetailItem label="Parents Contact" value={profile.parentContact} />
               <DetailItem label="Occupation" value={profile.occupation} />
               <DetailItem label="Location" value={profile.district} />
@@ -87,11 +116,11 @@ export default function FullProfileView() {
 
         <hr style={styles.divider} />
 
-        <div style={styles.sectionsContainer}>
+        <div style={styles.sectionsContainer} className="sections-grid-container">
           {/* Basic Info */}
           <div style={styles.sectionCard}>
             <h3 style={styles.sectionTitle}>📌 Basic Info</h3>
-            <div style={styles.gridTwoColumn}>
+            <div style={styles.gridTwoColumn} className="two-column-grid">
               <DetailItem label="Age" value={profile.age ? `${profile.age} Years` : null} />
               <DetailItem label="Gender" value={profile.gender} />
               <DetailItem label="Marital Status" value={profile.maritalStatus} />
@@ -105,7 +134,7 @@ export default function FullProfileView() {
           {/* Religious Background */}
           <div style={styles.sectionCard}>
             <h3 style={styles.sectionTitle}>🛕 Religious Background</h3>
-            <div style={styles.gridTwoColumn}>
+            <div style={styles.gridTwoColumn} className="two-column-grid">
               <DetailItem label="Kulam" value={profile.kulam} />
               <DetailItem label="Kuladeivam" value={profile.kuladeivam} />
               <DetailItem label="Caste / Subcaste" value={(profile.caste || profile.subCaste) ? `${profile.caste || '-'} / ${profile.subCaste || '-'}` : null} />
@@ -116,7 +145,7 @@ export default function FullProfileView() {
           {/* Education & Career */}
           <div style={styles.sectionCard}>
             <h3 style={styles.sectionTitle}>🎓 Education & Career</h3>
-            <div style={styles.gridTwoColumn}>
+            <div style={styles.gridTwoColumn} className="two-column-grid">
               <DetailItem label="Education" value={profile.education} />
               <DetailItem label="Occupation" value={profile.occupation} />
               <DetailItem label="Company" value={profile.company} />
@@ -127,7 +156,7 @@ export default function FullProfileView() {
           {/* Family & Location */}
           <div style={styles.sectionCard}>
             <h3 style={styles.sectionTitle}>🏠 Family & Location</h3>
-            <div style={styles.gridTwoColumn}>
+            <div style={styles.gridTwoColumn} className="two-column-grid">
               <DetailItem label="Father's Name" value={profile.fatherName} />
               <DetailItem label="Mother's Name" value={profile.motherName} />
               <DetailItem label="Parents Contact" value={profile.parentContact} />
@@ -137,7 +166,7 @@ export default function FullProfileView() {
           </div>
         </div>
 
-        {/* Unconditionally show Description Card so it always renders */}
+        {/* Profile Notes */}
         <div style={{ ...styles.sectionCard, marginTop: '24px' }}>
           <h3 style={styles.sectionTitle}>📝 Profile Description / Notes</h3>
           <p style={styles.descriptionText}>
@@ -198,6 +227,9 @@ const styles = {
   },
   imageWrapper: {
     flexShrink: 0,
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
   },
   profileImage: {
     width: '260px',
@@ -262,7 +294,7 @@ const styles = {
   },
   sectionsContainer: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
     gap: '24px',
   },
   sectionCard: {
@@ -280,7 +312,7 @@ const styles = {
   },
   gridTwoColumn: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
     gap: '12px',
   },
   detailItem: {
