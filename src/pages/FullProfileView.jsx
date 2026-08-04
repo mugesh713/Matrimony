@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../services/api';
 
 const DetailItem = ({ label, value }) => (
   <div style={styles.detailItem}>
@@ -18,15 +18,23 @@ export default function FullProfileView() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`/api/profiles/${id}`);
-        setProfile(res.data.profile);
+        setLoading(true);
+        const res = await API.get(`/profiles/${id}`);
+        if (res.data && res.data.profile) {
+          setProfile(res.data.profile);
+        } else if (res.data) {
+          setProfile(res.data);
+        }
       } catch (err) {
-        console.error("Failed to load profile", err);
+        console.error("Failed to load profile details:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchProfile();
+
+    if (id) {
+      fetchProfile();
+    }
   }, [id]);
 
   if (loading) {
@@ -41,7 +49,7 @@ export default function FullProfileView() {
     return (
       <div style={styles.centerContainer}>
         <div style={styles.errorText}>Profile not found!</div>
-        <button onClick={() => navigate(-1)} style={styles.backButton}>&larr; Go Back</button>
+        <button onClick={() => navigate('/profiles')} style={styles.backButton}>&larr; Back to Profiles</button>
       </div>
     );
   }
@@ -50,7 +58,6 @@ export default function FullProfileView() {
 
   return (
     <div style={styles.pageWrapper}>
-      {/* Mobile Responsive Global Styles */}
       <style>{`
         @media (max-width: 768px) {
           .profile-header-container {
@@ -93,7 +100,7 @@ export default function FullProfileView() {
           <div style={styles.headerInfo}>
             <div>
               <div style={styles.badgeGroup} className="badge-group-container">
-                <span style={styles.idBadge}>ID: {profile.memberId || profile.vtvId}</span>
+                <span style={styles.idBadge}>ID: {profile.memberId || profile.vtvId || profile._id}</span>
                 {profile.maritalStatus && (
                   <span style={styles.statusBadge}>{profile.maritalStatus}</span>
                 )}
@@ -117,7 +124,6 @@ export default function FullProfileView() {
         <hr style={styles.divider} />
 
         <div style={styles.sectionsContainer} className="sections-grid-container">
-          {/* Basic Info */}
           <div style={styles.sectionCard}>
             <h3 style={styles.sectionTitle}>📌 Basic Info</h3>
             <div style={styles.gridTwoColumn} className="two-column-grid">
@@ -131,7 +137,6 @@ export default function FullProfileView() {
             </div>
           </div>
 
-          {/* Religious Background */}
           <div style={styles.sectionCard}>
             <h3 style={styles.sectionTitle}>🛕 Religious Background</h3>
             <div style={styles.gridTwoColumn} className="two-column-grid">
@@ -142,7 +147,6 @@ export default function FullProfileView() {
             </div>
           </div>
 
-          {/* Education & Career */}
           <div style={styles.sectionCard}>
             <h3 style={styles.sectionTitle}>🎓 Education & Career</h3>
             <div style={styles.gridTwoColumn} className="two-column-grid">
@@ -153,7 +157,6 @@ export default function FullProfileView() {
             </div>
           </div>
 
-          {/* Family & Location */}
           <div style={styles.sectionCard}>
             <h3 style={styles.sectionTitle}>🏠 Family & Location</h3>
             <div style={styles.gridTwoColumn} className="two-column-grid">
@@ -166,7 +169,6 @@ export default function FullProfileView() {
           </div>
         </div>
 
-        {/* Profile Notes */}
         <div style={{ ...styles.sectionCard, marginTop: '24px' }}>
           <h3 style={styles.sectionTitle}>📝 Profile Description / Notes</h3>
           <p style={styles.descriptionText}>
@@ -178,7 +180,6 @@ export default function FullProfileView() {
   );
 }
 
-// Extracted Clean Inline Styles
 const styles = {
   pageWrapper: {
     backgroundColor: '#f4f6f9',
