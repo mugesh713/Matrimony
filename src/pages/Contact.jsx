@@ -7,86 +7,157 @@ export default function Contact() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitted(true);
+    setFormData({ name: '', email: '', phone: '', message: '' });
   };
 
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', padding: '60px 20px', fontFamily: 'sans-serif' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto', backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05)', overflow: 'hidden', display: 'flex', flexWrap: 'wrap' }}>
-        
-        {/* Info Column */}
-        <div style={{ flex: '1 1 350px', backgroundColor: '#0f172a', color: '#fff', padding: '40px' }}>
-          <h2 style={{ fontSize: '28px', color: '#fbbf24', marginBottom: '20px' }}>Get in Touch 🌿</h2>
-          <p style={{ color: '#94a3b8', lineHeight: '1.6', marginBottom: '30px' }}>
-            Have questions regarding profile verification or registration? Our matchmaking support team is here to help you.
-          </p>
+    <div className="contact-wrapper">
+      <style>{`
+        .contact-wrapper {
+          background-color: #f8fafc;
+          min-height: 100vh;
+          padding: 50px 20px;
+          font-family: system-ui, -apple-system, sans-serif;
+          box-sizing: border-box;
+        }
+        .contact-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 30px;
+          max-width: 1000px;
+          margin: 0 auto;
+        }
+        .contact-card {
+          background: #fff;
+          padding: 30px;
+          border-radius: 16px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .input-field {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          margin-top: 6px;
+          margin-bottom: 16px;
+          box-sizing: border-box;
+          font-size: 14px;
+        }
+        .submit-btn {
+          background-color: #7a1c1c;
+          color: #fff;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-weight: bold;
+          cursor: pointer;
+          width: 100%;
+        }
+        @media (max-width: 600px) {
+          .contact-wrapper { padding: 25px 15px; }
+          .contact-card { padding: 20px; }
+        }
+      `}</style>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 40px' }}>
+        <h1 style={{ fontSize: '32px', color: '#1a1a1a', marginBottom: '10px' }}>Contact Support</h1>
+        <p style={{ color: '#666', fontSize: '15px' }}>
+          Have questions about memberships or need help with your profile? Get in touch with us!
+        </p>
+      </div>
+
+      <div className="contact-grid">
+        {/* Left Side: Contact Information */}
+        <div className="contact-card" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <h3 style={{ color: '#7a1c1c', margin: 0, fontSize: '20px' }}>Get In Touch</h3>
+          
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
+            <div style={{ fontSize: '24px' }}>📍</div>
             <div>
-              <p style={{ margin: 0, color: '#f59e0b', fontSize: '12px', fontWeight: 'bold' }}>OFFICE ADDRESS</p>
-              <p style={{ margin: '4px 0 0', fontSize: '15px' }}>Coimbatore, Tamil Nadu, India</p>
+              <strong style={{ display: 'block', fontSize: '15px' }}>Office Address</strong>
+              <span style={{ color: '#666', fontSize: '14px' }}>Main Road, City Center, Tamil Nadu, India</span>
             </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
+            <div style={{ fontSize: '24px' }}>📞</div>
             <div>
-              <p style={{ margin: 0, color: '#f59e0b', fontSize: '12px', fontWeight: 'bold' }}>PHONE SUPPORT</p>
-              <p style={{ margin: '4px 0 0', fontSize: '15px' }}>+91 94455 55941</p>
+              <strong style={{ display: 'block', fontSize: '15px' }}>Phone / WhatsApp</strong>
+              <span style={{ color: '#666', fontSize: '14px' }}>+91 98765 43210</span>
             </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
+            <div style={{ fontSize: '24px' }}>✉️</div>
             <div>
-              <p style={{ margin: 0, color: '#f59e0b', fontSize: '12px', fontWeight: 'bold' }}>EMAIL ADDRESS</p>
-              <p style={{ margin: '4px 0 0', fontSize: '15px' }}>help@varam.app</p>
+              <strong style={{ display: 'block', fontSize: '15px' }}>Email Support</strong>
+              <span style={{ color: '#666', fontSize: '14px' }}>support@matrimony.com</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
+            <div style={{ fontSize: '24px' }}>⏰</div>
+            <div>
+              <strong style={{ display: 'block', fontSize: '15px' }}>Working Hours</strong>
+              <span style={{ color: '#666', fontSize: '14px' }}>Mon - Sat: 9:00 AM - 7:00 PM</span>
             </div>
           </div>
         </div>
 
-        {/* Form Column */}
-        <div style={{ flex: '1 1 450px', padding: '40px' }}>
-          <h3 style={{ fontSize: '22px', color: '#0f172a', marginBottom: '20px' }}>Send Us a Message</h3>
-          {submitted ? (
-            <div style={{ padding: '20px', backgroundColor: '#dcfce7', color: '#166534', borderRadius: '8px' }}>
-              Thank you for contacting us! Our support team will reach out within 24 hours.
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <input
-                type="text"
-                placeholder="Your Name"
-                required
-                style={{ padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '14px' }}
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-              <input
-                type="email"
-                placeholder="Your Email"
-                required
-                style={{ padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '14px' }}
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                required
-                style={{ padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '14px' }}
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
-              <textarea
-                placeholder="How can we help you?"
-                rows="4"
-                required
-                style={{ padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '14px', fontFamily: 'inherit' }}
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              ></textarea>
-              <button
-                type="submit"
-                style={{ padding: '12px', backgroundColor: '#991b1b', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}
-              >
-                Send Message
-              </button>
-            </form>
-          )}
-        </div>
+        {/* Right Side: Message Form */}
+        <div className="contact-card">
+          <h3 style={{ margin: '0 0 20px 0', fontSize: '20px', color: '#1a1a1a' }}>Send Us a Message</h3>
 
+          {submitted && (
+            <div style={{ backgroundColor: '#f0fdf4', color: '#166534', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
+              ✓ Thank you! Your message has been sent.
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <label style={{ fontSize: '13px', fontWeight: '600' }}>Your Name *</label>
+            <input
+              required
+              className="input-field"
+              placeholder="Full name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            />
+
+            <label style={{ fontSize: '13px', fontWeight: '600' }}>Email Address *</label>
+            <input
+              type="email"
+              required
+              className="input-field"
+              placeholder="name@example.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+
+            <label style={{ fontSize: '13px', fontWeight: '600' }}>Phone Number</label>
+            <input
+              className="input-field"
+              placeholder="+91 Mobile Number"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            />
+
+            <label style={{ fontSize: '13px', fontWeight: '600' }}>Message *</label>
+            <textarea
+              required
+              rows={4}
+              className="input-field"
+              placeholder="How can we help you?"
+              style={{ resize: 'vertical' }}
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            />
+
+            <button type="submit" className="submit-btn">
+              Send Message
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
