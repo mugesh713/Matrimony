@@ -244,6 +244,28 @@ export default function SearchProfiles() {
                           <div><span style={{ color: '#888', display: 'block', fontSize: '11px' }}>MOBILE</span><strong>{profile.mobile || '-'}</strong></div>
                         </div>
                       </div>
+
+                      {/* FULL PROFILE VIEW BUTTON */}
+                      <div style={{ marginTop: '20px', textAlign: 'right' }}>
+                        <button
+                          onClick={() => navigate(`/profile/${profileId}`)}
+                          style={{
+                            backgroundColor: '#7a1c1c',
+                            color: '#fff',
+                            border: 'none',
+                            padding: '10px 20px',
+                            borderRadius: '6px',
+                            fontWeight: '600',
+                            fontSize: '13px',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                            transition: 'background-color 0.2s ease',
+                          }}
+                        >
+                          View Full Profile ➔
+                        </button>
+                      </div>
+
                     </div>
 
                   </div>
