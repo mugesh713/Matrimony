@@ -139,11 +139,7 @@ export default function Home({ user: propUser, onLogout }) {
 
       {/* 1. TOP UTILITY STRIP FOR PHONE / EMAIL */}
       
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <a href="tel:+919445555941" style={{ color: '#e2e8f0', textDecoration: 'none' }}>📞 +91 94455 55941</a>
-          <a href="mailto:help@varam.app" style={{ color: '#e2e8f0', textDecoration: 'none' }}>✉️ help@varam.app</a>
-        </div>
-      </div>
+       
 
       {/* 2. MAIN HEADER (LOGO + HOME | SEARCH | PLANS | CONTACT | PROFILE | LOGOUT) */}
       <header className="main-navbar" style={{ backgroundColor: '#ffffff', padding: '16px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 100 }}>
