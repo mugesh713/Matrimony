@@ -1,8 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function Home() {
+export default function Home({ user: propUser }) {
   const navigate = useNavigate();
+
+  // Retrieve user from props or fallback to localStorage if available
+  const [user, setUser] = useState(() => {
+    if (propUser) return propUser;
+    try {
+      const stored = localStorage.getItem('user');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    if (propUser) setUser(propUser);
+  }, [propUser]);
 
   // Search Form State
   const [gender, setGender] = useState('female');
@@ -48,7 +63,7 @@ export default function Home() {
   return (
     <div style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif", color: '#2d3748', backgroundColor: '#f8fafc', minHeight: '100vh', overflowX: 'hidden' }}>
       
-      {/* Dynamic CSS Styles & Mobile Animations */}
+      {/* Dynamic CSS Styles & Enhanced Mobile Responsiveness */}
       <style>{`
         @keyframes subtleScale {
           0% { opacity: 0; transform: translateY(20px); }
@@ -78,6 +93,24 @@ export default function Home() {
         .custom-select option {
           color: #222 !important;
           background-color: #fff !important;
+        }
+
+        /* --- Profile Badge Styling --- */
+        .header-profile-badge {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          background: rgba(255, 255, 255, 0.1);
+          padding: 4px 10px;
+          border-radius: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          transition: all 0.3s ease;
+        }
+
+        .header-profile-badge:hover {
+          background: rgba(255, 255, 255, 0.2);
+          border-color: #f59e0b;
         }
 
         /* --- Team Card Animations --- */
@@ -123,10 +156,15 @@ export default function Home() {
         /* --- Mobile Responsiveness Adjustments --- */
         @media (max-width: 768px) {
           .top-header-bar {
-            flex-direction: column;
-            gap: 8px;
-            padding: 10px 16px !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            padding: 12px 16px !important;
             text-align: center;
+          }
+          .contact-group {
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 12px !important;
           }
           .hero-title {
             font-size: 32px !important;
@@ -167,16 +205,59 @@ export default function Home() {
         }
       `}</style>
 
-      {/* 1. TOP UTILITY HEADER BAR */}
-      <header className="top-header-bar" style={{ backgroundColor: '#2d1810', color: '#e2e8f0', padding: '8px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-        <div style={{ display: 'flex', gap: '20px', fontWeight: '500' }}>
-          <span style={{ cursor: 'pointer' }}>🔍 About</span>
-          <span style={{ cursor: 'pointer' }}>FAQ</span>
-          <span style={{ cursor: 'pointer' }}>Contact</span>
+      {/* 1. TOP UTILITY HEADER BAR WITH FIXED CONTACT & PROFILE */}
+      <header 
+        className="top-header-bar" 
+        style={{ 
+          backgroundColor: '#2d1810', 
+          color: '#e2e8f0', 
+          padding: '10px 40px', 
+          display: 'flex', 
+          justify: 'space-between', 
+          alignItems: 'center', 
+          fontSize: '13px', 
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          boxSizing: 'border-box'
+        }}
+      >
+        <div style={{ display: 'flex', gap: '20px', fontWeight: '500', alignItems: 'center' }}>
+          <span style={{ cursor: 'pointer' }} onClick={() => navigate('/about')}>🔍 About</span>
+          <span style={{ cursor: 'pointer' }} onClick={() => navigate('/faq')}>FAQ</span>
+          <span style={{ cursor: 'pointer' }} onClick={() => navigate('/contact')}>Contact</span>
         </div>
-        <div style={{ display: 'flex', gap: '20px', opacity: 0.9, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <span>📞 +91 94455 55941</span>
-          <span>✉️ help@varam.app</span>
+
+        <div className="contact-group" style={{ display: 'flex', gap: '16px', opacity: 0.95, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
+          <a href="tel:+919445555941" style={{ color: '#e2e8f0', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            📞 +91 94455 55941
+          </a>
+          <a href="mailto:help@varam.app" style={{ color: '#e2e8f0', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            ✉️ help@varam.app
+          </a>
+
+          {/* User Profile Badge / Login Link */}
+          {user ? (
+            <div 
+              className="header-profile-badge"
+              onClick={() => navigate(`/profile/${user._id || user.id || ''}`)}
+              title="View Profile"
+            >
+              <img 
+                src={user.profileImage?.url || user.profileImage || user.photo || 'https://via.placeholder.com/30'} 
+                alt="Profile" 
+                style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #f59e0b' }} 
+              />
+              <span style={{ fontSize: '12px', fontWeight: '600', color: '#fff' }}>
+                {user.name || user.firstName || 'My Profile'}
+              </span>
+            </div>
+          ) : (
+            <span 
+              onClick={() => navigate('/login')} 
+              style={{ cursor: 'pointer', color: '#fbbf24', fontWeight: '600', textDecoration: 'underline' }}
+            >
+              🔑 Login
+            </span>
+          )}
         </div>
       </header>
 
@@ -415,10 +496,10 @@ export default function Home() {
           <div>
             <h4 style={{ color: '#f8fafc', marginBottom: '16px', fontSize: '14px', fontWeight: '700', letterSpacing: '0.5px' }}>HELP & SUPPORT</h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <li className="footer-link" style={{ fontSize: '13px', cursor: 'pointer' }}>About Company</li>
+              <li className="footer-link" style={{ fontSize: '13px', cursor: 'pointer' }} onClick={() => navigate('/about')}>About Company</li>
               <li className="footer-link" style={{ fontSize: '13px', cursor: 'pointer' }}>Privacy Policy</li>
-              <li className="footer-link" style={{ fontSize: '13px', cursor: 'pointer' }}>Contact Us</li>
-              <li className="footer-link" style={{ fontSize: '13px', cursor: 'pointer' }}>FAQs</li>
+              <li className="footer-link" style={{ fontSize: '13px', cursor: 'pointer' }} onClick={() => navigate('/contact')}>Contact Us</li>
+              <li className="footer-link" style={{ fontSize: '13px', cursor: 'pointer' }} onClick={() => navigate('/faq')}>FAQs</li>
             </ul>
           </div>
 
